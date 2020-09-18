@@ -5,16 +5,23 @@ import BuildControls from "../../components/Burger/BuildControls/BuildControls";
 import Modal from "../../components/UI/Modal/Modal";
 import OrderSummary from "../../components/Burger/OrderSummary/OrderSummary";
 
+const INGREDIENT_PRICE = {
+  salad: 0.5,
+  cheese: 0.4,
+  meat: 1.3,
+  bacon: 0.7,
+};
+
 class BurgerBuilder extends Component {
   state = {
     ingredients: {
-      salad: 0,
-      meat: 0,
-      bacon: 0,
-      cheese: 0,
+      salad: 1,
+      meat: 1,
+      bacon: 1,
+      cheese: 1,
     },
     ordered: false,
-    price: 4,
+    totalPrice: 6.9,
     disabled: true,
   };
 
@@ -23,7 +30,10 @@ class BurgerBuilder extends Component {
     const newCount = oldCount + 1;
     const updatedIngredients = { ...this.state.ingredients };
     updatedIngredients[type] = newCount;
+    const oldTotalPrice = this.state.totalPrice;
+    const updatedTotalPrice = oldTotalPrice + INGREDIENT_PRICE[type];
     this.setState({ ingredients: updatedIngredients });
+    this.setState({ totalPrice: updatedTotalPrice });
   };
 
   handleDeductIngredient = (type) => {
@@ -31,7 +41,10 @@ class BurgerBuilder extends Component {
     const newCount = oldCount - 1;
     const updatedIngredients = { ...this.state.ingredients };
     updatedIngredients[type] = newCount;
+    const oldTotalPrice = this.state.totalPrice;
+    const updatedTotalPrice = oldTotalPrice - INGREDIENT_PRICE[type];
     this.setState({ ingredients: updatedIngredients });
+    this.setState({ totalPrice: updatedTotalPrice });
   };
 
   handleOrdered = () => {
@@ -60,6 +73,7 @@ class BurgerBuilder extends Component {
         <Fragment>
           <Burger ingredients={this.state.ingredients} />
           <BuildControls
+            price={parseFloat(this.state.totalPrice.toFixed(2))}
             adding={this.handleAddIngredient}
             deducting={this.handleDeductIngredient}
             ordered={this.handleOrdered}
@@ -70,7 +84,7 @@ class BurgerBuilder extends Component {
       orderSummary = (
         <OrderSummary
           ingredients={this.state.ingredients}
-          price={this.state.price}
+          price={parseFloat(this.state.totalPrice.toFixed(2))}
           orderContinued={this.handleContinueOrder}
           orderCancled={this.handleCancleOrder}
         />
