@@ -17,16 +17,23 @@ const INGREDIENT_PRICE = {
 
 class BurgerBuilder extends Component {
   state = {
-    ingredients: {
-      salad: 1,
-      meat: 1,
-      bacon: 1,
-      cheese: 1,
-    },
+    ingredients: null,
     ordered: false,
     totalPrice: 6.9,
     disabled: true,
     loading: false,
+    error: false,
+  };
+
+  componentDidMount = () => {
+    axios({
+      method: "get",
+      url: "/ingredients.json",
+    })
+      .then((res) => {
+        this.setState({ ingredients: res.data });
+      })
+      .catch((error) => this.setState({ error: true }));
   };
 
   handleAddIngredient = (type) => {
@@ -90,8 +97,12 @@ class BurgerBuilder extends Component {
       disabledInfo[ingredient] = disabledInfo[ingredient] <= 0;
     }
 
-    let burger;
-    let orderSummary;
+    let orderSummary = null;
+    let burger = this.state.error ? (
+      <p>Ingredients can not be loaded!</p>
+    ) : (
+      <Spinner />
+    );
 
     if (this.state.ingredients) {
       burger = (
