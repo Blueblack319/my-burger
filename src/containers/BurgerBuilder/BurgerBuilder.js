@@ -4,6 +4,9 @@ import Burger from "../../components/Burger/Burger";
 import BuildControls from "../../components/Burger/BuildControls/BuildControls";
 import Modal from "../../components/UI/Modal/Modal";
 import OrderSummary from "../../components/Burger/OrderSummary/OrderSummary";
+import axios from "../../axios-order";
+import Spinner from "../../components/UI/Spinner/Spinner";
+import withErrorHandler from "../../hoc/withErrorHandler/withErrorHandler";
 
 const INGREDIENT_PRICE = {
   salad: 0.5,
@@ -23,6 +26,7 @@ class BurgerBuilder extends Component {
     ordered: false,
     totalPrice: 6.9,
     disabled: true,
+    loading: false,
   };
 
   handleAddIngredient = (type) => {
@@ -52,7 +56,28 @@ class BurgerBuilder extends Component {
   };
 
   handleContinueOrder = () => {
-    return;
+    this.setState({ loading: true });
+    const order = {
+      ingredients: this.state.ingredients,
+      price: this.state.totalPrice,
+      customer: {
+        name: "Crazybirdz",
+        address: {
+          street: "TestStreet 1",
+          zipCode: "42134",
+          country: "Korea",
+        },
+        email: "crazybirdz@test.com",
+      },
+      deliveryMethod: "fastest",
+    };
+    axios({
+      method: "post",
+      url: "/orders.json",
+      data: order,
+    })
+      .then((res) => this.setState({ loading: false, ordered: false }))
+      .catch((err) => this.setState({ loading: false, ordered: false }));
   };
 
   handleCancleOrder = () => {
@@ -90,6 +115,11 @@ class BurgerBuilder extends Component {
         />
       );
     }
+
+    if (this.state.loading) {
+      orderSummary = <Spinner />;
+    }
+
     return (
       <Fragment>
         <Modal
@@ -104,4 +134,4 @@ class BurgerBuilder extends Component {
   }
 }
 
-export default BurgerBuilder;
+export default withErrorHandler(BurgerBuilder, axios);

@@ -3,7 +3,7 @@ import React from "react";
 const OrderSummary = (props) => {
   const ingSummary = Object.keys(props.ingredients).map((ingKey) => {
     return (
-      <li>
+      <li key={ingKey}>
         <span>
           {ingKey}: {props.ingredients[ingKey]}
         </span>
